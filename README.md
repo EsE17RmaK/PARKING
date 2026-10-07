@@ -43,3 +43,26 @@ prioriparking-backend/
 ├── .env.example                    # Plantilla de variables de entorno
 ├── server.js                       # Punto de entrada principal del servidor Express
 └── package.json                    # Dependencias y scripts del proyecto
+
+## ⚙️ Ejecución de Procesos Bach (ETL)
+
+El backend cuenta con scripts automatizados para la ingesta masiva de datos universitarios:
+
+### Carga Masiva de Alumnos y Cursos (ETL):
+Asegúrate de tener los archivos `alumnos_matriculados_300.csv` y `secciones_horarios_300.csv` en la raíz y ejecuta:
+
+```bash
+node src/services/etlService.js
+
+### 2. 🔌 Catálogo de Endpoints REST (Para probar en Postman / cURL)
+
+Agrega una tabla simple con las rutas principales del servidor para que sepan a qué URLs hacer peticiones:
+
+```markdown
+## 🌐 Endpoints Principales de la API
+
+| Método | Endpoint | Descripción | Requiere JWT |
+| :--- | :--- | :--- | :---: |
+| **POST** | `/api/auth/login` | Autenticación de usuario y generación de Token JWT | ❌ No |
+| **GET** | `/api/estudiantes/prioritarios` | Listado de alumnos aptos ordenados por mérito académico | ✅ Sí |
+| **POST** | `/api/reservas` | Solicitud y asignación de plaza de estacionamiento | ✅ Sí |
