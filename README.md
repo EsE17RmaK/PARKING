@@ -2,6 +2,7 @@
 
 > **Sistema Web de Gestión y Asignación Prioritaria de Estacionamiento Universitario**  
 > *Universidad Tecnológica del Perú (UTP) - Curso: Integrador II*
+> *RENDER: https://parking-akup.onrender.com*
 
 ---
 
@@ -66,3 +67,6 @@ Agrega una tabla simple con las rutas principales del servidor para que sepan a 
 | **POST** | `/api/auth/login` | Autenticación de usuario y generación de Token JWT | ❌ No |
 | **GET** | `/api/estudiantes/prioritarios` | Listado de alumnos aptos ordenados por mérito académico | ✅ Sí |
 | **POST** | `/api/reservas` | Solicitud y asignación de plaza de estacionamiento | ✅ Sí |
+
+
+Superbase Password: g4-1dos3Parking

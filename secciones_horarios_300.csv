@@ -1,0 +1,51 @@
+codigo_seccion,nombre_curso,campus_sede,modalidad,dias_semana,horarios_clase,aulas
+24500,Integrador II,Lima Centro,Presencial,LUNES|MIÉRCOLES,08:00-09:30|08:00-09:30,A-402|A-402
+24501,Inteligencia de Negocios,Lima Centro,Presencial,MARTES|JUEVES,08:00-09:30|08:00-09:30,Lab-105|Lab-105
+24502,Ética Profesional,Lima Centro,Presencial,LUNES|MIÉRCOLES,11:00-12:30|11:00-12:30,Lab-301|Lab-301
+24503,Integrador II,Lima Centro,Presencial,LUNES,14:00-17:00,Lab-401
+24504,Computación en la Nube,Lima Centro,Presencial,MARTES|JUEVES,09:30-11:00|09:30-11:00,Lab-102|Lab-102
+24505,Estructura de Datos,Lima Centro,Presencial,LUNES|MIÉRCOLES,08:00-09:30|08:00-09:30,A-402|A-402
+24506,Arquitectura de Software,Lima Centro,Presencial,MARTES|JUEVES,09:30-11:00|09:30-11:00,Lab-102|Lab-102
+24507,Gestión de Proyectos,Lima Centro,Presencial,MARTES|JUEVES,08:00-09:30|08:00-09:30,Lab-105|Lab-105
+24508,Análisis de Datos,Lima Centro,Presencial,JUEVES,18:30-21:30,A-304
+24509,Arquitectura de Software,Lima Centro,Presencial,MARTES,14:00-17:00,Lab-205
+24510,Gestión de Proyectos,Lima Centro,Presencial,MIÉRCOLES,14:00-17:00,A-302
+24511,Computación en la Nube,Lima Centro,Presencial,VIERNES,14:00-17:00,Lab-201
+24512,Ética Profesional,Lima Centro,Presencial,SÁBADO,08:00-11:00,A-501
+24513,Inteligencia de Negocios,Lima Centro,Presencial,VIERNES,18:30-21:30,Lab-202
+24514,Arquitectura de Software,Lima Centro,Presencial,VIERNES,18:30-21:30,Lab-202
+24515,Redes y Comunicaciones,Lima Centro,Presencial,MIÉRCOLES,14:00-17:00,A-302
+24516,Estructura de Datos,Lima Centro,Presencial,LUNES|MIÉRCOLES,18:30-20:00|18:30-20:00,A-101|A-101
+24517,Inteligencia de Negocios,Lima Centro,Presencial,LUNES|MIÉRCOLES,11:00-12:30|11:00-12:30,Lab-301|Lab-301
+24518,Gestión de Proyectos,Lima Centro,Presencial,VIERNES,18:30-21:30,Lab-202
+24519,Calidad de Software,Lima Centro,Presencial,MARTES|JUEVES,09:30-11:00|09:30-11:00,Lab-102|Lab-102
+24520,Base de Datos Avanzada,Lima Centro,Presencial,VIERNES,14:00-17:00,Lab-201
+24521,Integrador II,Lima Centro,Presencial,LUNES|MIÉRCOLES,18:30-20:00|18:30-20:00,A-101|A-101
+24522,Sistemas Distribuidos,Lima Centro,Presencial,JUEVES,18:30-21:30,A-304
+24523,Inteligencia de Negocios,Lima Centro,Presencial,VIERNES,18:30-21:30,Lab-202
+24524,Seguridad Informática,Lima Centro,Presencial,MIÉRCOLES,14:00-17:00,A-302
+24525,Algoritmos Avanzados,Lima Centro,Presencial,MARTES,14:00-17:00,Lab-205
+24526,Integrador II,Lima Centro,Presencial,VIERNES,14:00-17:00,Lab-201
+24527,Base de Datos Avanzada,Lima Centro,Presencial,MARTES,14:00-17:00,Lab-205
+24528,Desarrollo Web Integrado,Lima Centro,Presencial,LUNES,14:00-17:00,Lab-401
+24529,Sistemas Distribuidos,Lima Centro,Presencial,JUEVES,18:30-21:30,A-304
+24530,Gestión de Proyectos,Lima Centro,Presencial,MIÉRCOLES,14:00-17:00,A-302
+24531,Base de Datos Avanzada,Lima Centro,Presencial,LUNES|MIÉRCOLES,08:00-09:30|08:00-09:30,A-402|A-402
+24532,Ética Profesional,Lima Centro,Presencial,VIERNES,18:30-21:30,Lab-202
+24533,Desarrollo Web Integrado,Lima Centro,Presencial,MARTES|JUEVES,09:30-11:00|09:30-11:00,Lab-102|Lab-102
+24534,Ética Profesional,Lima Centro,Presencial,MARTES|JUEVES,09:30-11:00|09:30-11:00,Lab-102|Lab-102
+24535,Liderazgo y Trabajo en Equipo,Lima Centro,Presencial,VIERNES|SÁBADO,09:30-11:00|11:00-12:30,A-201|A-201
+24536,Algoritmos Avanzados,Lima Centro,Presencial,LUNES,14:00-17:00,Lab-401
+24537,Sistemas Distribuidos,Lima Centro,Presencial,LUNES|MIÉRCOLES,11:00-12:30|11:00-12:30,Lab-301|Lab-301
+24538,Sistemas Distribuidos,Lima Centro,Presencial,LUNES|MIÉRCOLES,18:30-20:00|18:30-20:00,A-101|A-101
+24539,Gestión de Proyectos,Lima Centro,Presencial,LUNES,14:00-17:00,Lab-401
+24540,Inteligencia de Negocios,Lima Centro,Presencial,MIÉRCOLES,14:00-17:00,A-302
+24541,Base de Datos Avanzada,Lima Centro,Presencial,JUEVES,18:30-21:30,A-304
+24542,Redes y Comunicaciones,Lima Centro,Presencial,MARTES,14:00-17:00,Lab-205
+24543,Ética Profesional,Lima Centro,Presencial,LUNES|MIÉRCOLES,11:00-12:30|11:00-12:30,Lab-301|Lab-301
+24544,Algoritmos Avanzados,Lima Centro,Presencial,VIERNES,14:00-17:00,Lab-201
+24545,Inteligencia de Negocios,Lima Centro,Presencial,LUNES,14:00-17:00,Lab-401
+24546,Computación en la Nube,Lima Centro,Presencial,MARTES|JUEVES,08:00-09:30|08:00-09:30,Lab-105|Lab-105
+24547,Calidad de Software,Lima Centro,Presencial,VIERNES,18:30-21:30,Lab-202
+24548,Seguridad Informática,Lima Centro,Presencial,MARTES|JUEVES,08:00-09:30|08:00-09:30,Lab-105|Lab-105
+24549,Seguridad Informática,Lima Centro,Presencial,VIERNES,18:30-21:30,Lab-202
