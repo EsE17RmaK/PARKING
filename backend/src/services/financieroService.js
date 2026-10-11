@@ -1,4 +1,6 @@
-* Servicio para HU-03 / RF03: Verificación de solvencia financiera
+// 
+/**
+ * * Servicio para HU-03 / RF03: Verificación de solvencia financiera
  */
 export const validarSolvenciaFinanciera = (condicionPensiones, cuotasVencidas = 0) => {
   const tieneDeuda = 
