@@ -18,7 +18,7 @@ export default function DashboardEstudiante({ onLogout }) {
     codigo_estudiante: '20241028',
     promedio_academico: 17,
     porcentaje_asistencia: 92,
-    condicion_pensiones: 'Al día',
+    condicion_pensiones: 'Al día', // Si cambia a 'Con deuda', se aplican las reglas de la HU-03
     penalidades: 0,
     nivel_prioridad: 'Prioridad Alta',
   });
@@ -30,6 +30,9 @@ export default function DashboardEstudiante({ onLogout }) {
   const [showToast, setShowToast] = useState(false);
   const [mensajeToast, setMensajeToast] = useState('');
 
+  // Validación HU-03: Solvencia financiera
+  const esSolvente = estudiante.condicion_pensiones?.toLowerCase() === 'al día';
+
   useEffect(() => {
     const sesion = localStorage.getItem('usuario');
     if (sesion) {
@@ -39,6 +42,7 @@ export default function DashboardEstudiante({ onLogout }) {
           ...prev,
           nombre_completo: parsed.nombre_completo || prev.nombre_completo,
           codigo_estudiante: parsed.codigo_estudiante || prev.codigo_estudiante,
+          condicion_pensiones: parsed.condicion_pensiones || prev.condicion_pensiones,
         }));
       } catch (err) {
         console.error('Error al leer sesión:', err);
@@ -54,6 +58,12 @@ export default function DashboardEstudiante({ onLogout }) {
 
   const handleConfirmReservation = (e) => {
     e.preventDefault();
+    if (!esSolvente) {
+      setMensajeToast('Acceso denegado: regularice sus pensiones pendientes.');
+      setShowToast(true);
+      setTimeout(() => setShowToast(false), 3500);
+      return;
+    }
     setMensajeToast(`¡Reserva confirmada en ${selectedSpace} para el vehículo ${vehiculo}!`);
     setShowToast(true);
     setTimeout(() => setShowToast(false), 3500);
@@ -164,6 +174,21 @@ export default function DashboardEstudiante({ onLogout }) {
             <div className="dash-pill-semester">Semestre 2026-II</div>
           </div>
 
+          {/* HU-03 ALERTA SI TIENE DEUDAS */}
+          {!esSolvente && (
+            <div className="dash-debt-alert">
+              <svg width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                <circle cx="12" cy="12" r="10" />
+                <line x1="12" y1="8" x2="12" y2="12" />
+                <line x1="12" y1="16" x2="12.01" y2="16" />
+              </svg>
+              <div>
+                <strong>Acceso restringido por cuotas vencidas (HU-03)</strong>
+                <p>Mantiene pagos pendientes con la institución. Regularice su estado para habilitar el sistema de reservas.</p>
+              </div>
+            </div>
+          )}
+
           {/* TARJETA PRIORIDAD */}
           <div className="dash-card">
             <div className="dash-card-header">
@@ -210,12 +235,18 @@ export default function DashboardEstudiante({ onLogout }) {
 
               <div className="dash-grid-line" />
 
+              {/* Condición de pensiones con validación de solvencia */}
               <div className="dash-metric-item">
                 <span style={{ fontSize: '13px', color: '#6b7280' }}>Condición de pensiones</span>
-                <span className="dash-badge-high" style={{ width: 'fit-content' }}>
-                  ✓ {estudiante.condicion_pensiones}
+                <span
+                  className={esSolvente ? 'dash-badge-high' : 'dash-badge-debt'}
+                  style={{ width: 'fit-content' }}
+                >
+                  {esSolvente ? '✓ Al día' : '⚠ Con deuda'}
                 </span>
-                <span className="dash-metric-sub">Sin pagos pendientes</span>
+                <span className="dash-metric-sub">
+                  {esSolvente ? 'Sin pagos pendientes' : 'Cuotas vencidas registradas'}
+                </span>
               </div>
 
               <div className="dash-metric-item">
@@ -257,6 +288,7 @@ export default function DashboardEstudiante({ onLogout }) {
                       <input
                         type="text"
                         value={fechaReserva}
+                        disabled={!esSolvente}
                         onChange={(e) => setFechaReserva(e.target.value)}
                       />
                       <svg width="16" height="16" fill="none" stroke="#6b7280" strokeWidth="2" viewBox="0 0 24 24">
@@ -270,7 +302,11 @@ export default function DashboardEstudiante({ onLogout }) {
                   <div className="dash-input-wrap">
                     <label>Horario académico</label>
                     <div className="dash-field-box">
-                      <select value={horario} onChange={(e) => setHorario(e.target.value)}>
+                      <select 
+                        value={horario} 
+                        disabled={!esSolvente}
+                        onChange={(e) => setHorario(e.target.value)}
+                      >
                         <option>08:00 – 12:00</option>
                         <option>13:00 – 17:00</option>
                         <option>18:00 – 22:00</option>
@@ -291,7 +327,11 @@ export default function DashboardEstudiante({ onLogout }) {
                   <div className="dash-input-wrap">
                     <label>Vehículo</label>
                     <div className="dash-field-box">
-                      <select value={vehiculo} onChange={(e) => setVehiculo(e.target.value)}>
+                      <select 
+                        value={vehiculo} 
+                        disabled={!esSolvente}
+                        onChange={(e) => setVehiculo(e.target.value)}
+                      >
                         <option>ABC-123</option>
                         <option>XYZ-742</option>
                       </select>
@@ -307,11 +347,18 @@ export default function DashboardEstudiante({ onLogout }) {
                   <span>Lunes 12 de octubre · 4 horas de estacionamiento</span>
                 </div>
 
-                <button type="submit" className="dash-btn-confirm">
-                  Confirmar reserva →
+                <button 
+                  type="submit" 
+                  className="dash-btn-confirm"
+                  disabled={!esSolvente}
+                  style={{ opacity: esSolvente ? 1 : 0.5, cursor: esSolvente ? 'pointer' : 'not-allowed' }}
+                >
+                  {esSolvente ? 'Confirmar reserva →' : 'Bloqueado por deuda'}
                 </button>
                 <p className="dash-subtext-note">
-                  La reserva está sujeta a disponibilidad al momento de confirmar.
+                  {esSolvente 
+                    ? 'La reserva está sujeta a disponibilidad al momento de confirmar.' 
+                    : 'Debe regularizar sus cuotas para poder reservar un espacio.'}
                 </p>
               </form>
             </div>
@@ -339,7 +386,7 @@ export default function DashboardEstudiante({ onLogout }) {
                       <button
                         key={space.id}
                         type="button"
-                        disabled={isOccupied}
+                        disabled={isOccupied || !esSolvente}
                         onClick={() => setSelectedSpace(space.id)}
                         className={`dash-space-slot ${
                           isSelected ? 'selected' : isOccupied ? 'occupied' : 'available'
@@ -366,7 +413,7 @@ export default function DashboardEstudiante({ onLogout }) {
                       <button
                         key={space.id}
                         type="button"
-                        disabled={isOccupied}
+                        disabled={isOccupied || !esSolvente}
                         onClick={() => setSelectedSpace(space.id)}
                         className={`dash-space-slot ${
                           isSelected ? 'selected' : isOccupied ? 'occupied' : 'available'
