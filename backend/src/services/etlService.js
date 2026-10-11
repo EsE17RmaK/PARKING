@@ -1,138 +1,127 @@
 // backend/src/services/etlService.js
-const path = require('path');
 const fs = require('fs');
+const path = require('path');
+const csv = require('csv-parser');
 const bcrypt = require('bcryptjs');
 const db = require('../config/db');
 
-function buscarRutaCSV(nombreArchivo) {
-  const rutas = [
-    path.join(process.cwd(), nombreArchivo),
-    path.join(process.cwd(), 'backend', nombreArchivo),
-    path.resolve(__dirname, '../../..', nombreArchivo),
-    path.resolve(__dirname, '../..', nombreArchivo),
-  ];
-  for (const r of rutas) {
-    if (fs.existsSync(r)) return r;
-  }
-  throw new Error(`No se encontró el archivo: ${nombreArchivo}`);
-}
+async function ejecutarETL() {
+  console.log('🔄 Iniciando Carga ETL: 150 estudiantes con contraseña DNI...');
 
-async function importarCSVs() {
-  console.log("🔄 Iniciando Ingesta ETL de Archivos CSV...");
+  const posiblesRutas = [
+    path.join(__dirname, '../../alumnos_matriculados_150.csv'),
+    path.join(__dirname, '../../../alumnos_matriculados_150.csv'),
+    path.join(process.cwd(), 'alumnos_matriculados_150.csv'),
+  ];
+
+  const rutaCsv = posiblesRutas.find((r) => fs.existsSync(r));
+  if (!rutaCsv) {
+    console.error('❌ Error: No se encontró alumnos_matriculados_150.csv en backend.');
+    process.exit(1);
+  }
 
   try {
-    // Hash BCrypt universal para los estudiantes del CSV
-    const contrasenaPlana = 'Password123!';
-    const hashValido = await bcrypt.hash(contrasenaPlana, 10);
+    const alumnos = [];
+    await new Promise((resolve, reject) => {
+      fs.createReadStream(rutaCsv)
+        .pipe(csv())
+        .on('data', (row) => alumnos.push(row))
+        .on('end', resolve)
+        .on('error', reject);
+    });
 
-    // 1. Ingesta de Cursos y Horarios (secciones_horarios_300.csv)
-    const rutaSecciones = buscarRutaCSV('secciones_horarios_300.csv');
-    const lineasSecciones = fs.readFileSync(rutaSecciones, 'utf-8').split('\n').filter(l => l.trim());
-    console.log(`📚 1. Guardando ${lineasSecciones.length - 1} secciones...`);
+    console.log(`📂 Procesando ${alumnos.length} estudiantes del CSV...`);
 
-    for (let i = 1; i < lineasSecciones.length; i++) {
-      const col = lineasSecciones[i].split(',');
-      if (col.length < 4) continue;
+    for (const al of alumnos) {
+      const codigo = (al.codigo_estudiante || '').trim();
+      const correo = (al.correo_institucional || `${codigo.toLowerCase()}@utp.edu.pe`).trim().toLowerCase();
+      const nombre = (al.nombres_apellidos || 'Estudiante UTP').trim();
+      const dni = String(al.dni || '').trim();
+      const celular = String(al.celular || '900000000').trim();
+      const promedio = parseFloat(al.promedio_periodo || 0.0);
+      const asistencia = parseFloat(al.porcentaje_asistencia || 0.0);
+      const merito = (al.pertenece_merito || '-').trim();
 
-      const codigo_seccion = col[0].trim();
-      const nombre_curso = col[1].trim();
-      const campus_sede = col[2].trim();
-      const modalidad = col[3].trim();
+      const alDia = String(al.pensiones_al_dia).toLowerCase() === 'true';
+      const condicion = alDia ? 'AL DIA' : 'CON DEUDA';
 
-      await db.query(`
-        INSERT INTO SECCIONES (codigo_seccion, nombre_curso, campus_sede, modalidad)
-        VALUES ($1, $2, $3, $4)
-        ON CONFLICT (codigo_seccion) DO UPDATE 
-        SET nombre_curso = EXCLUDED.nombre_curso,
-            campus_sede = EXCLUDED.campus_sede,
-            modalidad = EXCLUDED.modalidad;
-      `, [codigo_seccion, nombre_curso, campus_sede, modalidad]);
-    }
-    console.log("✅ Secciones importadas correctamente.");
+      // 🔐 La contraseña cifrada de cada estudiante es su propio DNI
+      const passwordDni = dni || '12345678';
+      const contrasenaHash = await bcrypt.hash(passwordDni, 10);
 
-    // 2. Ingesta de Alumnos Matriculados (alumnos_matriculados_300.csv)
-    const rutaAlumnos = buscarRutaCSV('alumnos_matriculados_300.csv');
-    const lineasAlumnos = fs.readFileSync(rutaAlumnos, 'utf-8').split('\n').filter(l => l.trim());
-    console.log(`👨‍🎓 2. Guardando ${lineasAlumnos.length - 1} alumnos...`);
-
-    let totalAlumnos = 0;
-
-    for (let i = 1; i < lineasAlumnos.length; i++) {
-      const col = lineasAlumnos[i].split(',');
-      if (col.length < 9) continue;
-
-      const codigo_estudiante = col[0].trim();
-      const dni = col[1].trim();
-      const nombres_apellidos = col[2].trim();
-      const correo_institucional = col[3].trim().toLowerCase();
-      const celular = col[4].trim();
-      const promedio_academico = parseFloat(col[5]) || 0;
-      const porcentaje_asistencia = parseFloat(col[6]) || 0;
-      const merito_academico = col[7] ? col[7].trim() : '-';
-      const alDia = col[8] && col[8].trim().toUpperCase() === 'TRUE';
-      const condicion_pensiones = alDia ? 'AL DIA' : 'MOROSO';
-      const codigos_seccion = col[10] ? col[10].trim().split('|') : [];
-
-      // A) Insertar usuario estudiante
-      const resUser = await db.query(`
-        INSERT INTO USUARIOS (correo_institucional, contrasena_hash, nombre_completo, dni, celular, rol, estado)
+      // 1. Insertar / Actualizar en USUARIOS
+      const resUser = await db.query(
+        `
+        INSERT INTO usuarios (correo_institucional, contrasena_hash, nombre_completo, dni, celular, rol, estado)
         VALUES ($1, $2, $3, $4, $5, 'ESTUDIANTE', 'ACTIVO')
         ON CONFLICT (correo_institucional) DO UPDATE 
         SET contrasena_hash = EXCLUDED.contrasena_hash,
             nombre_completo = EXCLUDED.nombre_completo,
-            estado = 'ACTIVO'
+            dni = EXCLUDED.dni
         RETURNING id_usuario;
-      `, [correo_institucional, hashValido, nombres_apellidos, dni, celular]);
+      `,
+        [correo, contrasenaHash, nombre, dni, celular]
+      );
 
-      const id_usuario = resUser.rows[0].id_usuario;
+      const idUsuario = resUser.rows[0].id_usuario;
 
-      // B) Insertar registro de estudiante
-      const resEst = await db.query(`
-        INSERT INTO ESTUDIANTES (id_usuario, codigo_estudiante, promedio_academico, porcentaje_asistencia, condicion_pensiones, merito_academico)
+      // 2. Insertar / Actualizar en ESTUDIANTES
+      await db.query(
+        `
+        INSERT INTO estudiantes (
+          id_usuario, codigo_estudiante, promedio_academico, porcentaje_asistencia, condicion_pensiones, pertenece_merito
+        )
         VALUES ($1, $2, $3, $4, $5, $6)
         ON CONFLICT (codigo_estudiante) DO UPDATE 
         SET promedio_academico = EXCLUDED.promedio_academico,
             porcentaje_asistencia = EXCLUDED.porcentaje_asistencia,
             condicion_pensiones = EXCLUDED.condicion_pensiones,
-            merito_academico = EXCLUDED.merito_academico
-        RETURNING id_estudiante;
-      `, [id_usuario, codigo_estudiante, promedio_academico, porcentaje_asistencia, condicion_pensiones, merito_academico]);
-
-      let id_estudiante = resEst.rows[0]?.id_estudiante;
-      if (!id_estudiante) {
-        const estExist = await db.query(`SELECT id_estudiante FROM ESTUDIANTES WHERE codigo_estudiante = $1`, [codigo_estudiante]);
-        id_estudiante = estExist.rows[0]?.id_estudiante;
-      }
-
-      // C) Asociar matrículas a secciones
-      if (id_estudiante) {
-        for (const codSec of codigos_seccion) {
-          if (!codSec) continue;
-          const secRes = await db.query(`SELECT id_seccion FROM SECCIONES WHERE codigo_seccion = $1`, [codSec.trim()]);
-          if (secRes.rows.length > 0) {
-            await db.query(`
-              INSERT INTO MATRICULAS_ESTUDIANTE (id_estudiante, id_seccion)
-              VALUES ($1, $2)
-              ON CONFLICT DO NOTHING;
-            `, [id_estudiante, secRes.rows[0].id_seccion]);
-          }
-        }
-      }
-
-      totalAlumnos++;
-      if (totalAlumnos % 50 === 0 || totalAlumnos === lineasAlumnos.length - 1) {
-        console.log(`   ↳ [${totalAlumnos}/${lineasAlumnos.length - 1}] Alumnos importados...`);
-      }
+            pertenece_merito = EXCLUDED.pertenece_merito;
+      `,
+        [idUsuario, codigo, promedio, asistencia, condicion, merito]
+      );
     }
 
-    console.log("--------------------------------------------------");
-    console.log(`✅ Ingesta de CSVs finalizada: ${totalAlumnos} alumnos y ${lineasSecciones.length - 1} secciones.`);
-    console.log("--------------------------------------------------");
+    // 3. Cálculo algorítmico institucional (RF02 / HU-02)
+    console.log('⚙️ Calculando y persistiendo prioridades...');
+    await db.query(`
+      UPDATE estudiantes
+      SET 
+        puntaje_prioridad = ROUND(
+          ((promedio_academico / 20.0) * 40.0) +
+          ((porcentaje_asistencia / 100.0) * 40.0) +
+          (CASE WHEN UPPER(condicion_pensiones) = 'AL DIA' THEN 20.0 ELSE 0.0 END)
+        , 2),
+        nivel_prioridad = CASE 
+          WHEN (
+            ((promedio_academico / 20.0) * 40.0) +
+            ((porcentaje_asistencia / 100.0) * 40.0) +
+            (CASE WHEN UPPER(condicion_pensiones) = 'AL DIA' THEN 20.0 ELSE 0.0 END)
+          ) >= 80.0 THEN 'Prioridad Alta'
+          WHEN (
+            ((promedio_academico / 20.0) * 40.0) +
+            ((porcentaje_asistencia / 100.0) * 40.0) +
+            (CASE WHEN UPPER(condicion_pensiones) = 'AL DIA' THEN 20.0 ELSE 0.0 END)
+          ) >= 60.0 THEN 'Prioridad Media'
+          ELSE 'Prioridad Baja'
+        END,
+        fecha_actualizacion = NOW();
+    `);
+
+    console.log('--------------------------------------------------');
+    console.log('✅ PROCESO ETL COMPLETADO:');
+    console.log(`   - 150 estudiantes cargados con contraseña = DNI`);
+    console.log(`   - Prioridades calculadas y guardadas en Supabase`);
+    console.log('--------------------------------------------------');
     process.exit(0);
   } catch (error) {
-    console.error("❌ Error en la importación de CSVs:", error.message);
+    console.error('❌ Error en ETL:', error);
     process.exit(1);
   }
 }
 
-importarCSVs();
+if (require.main === module) {
+  ejecutarETL();
+}
+
+module.exports = { ejecutarETL };

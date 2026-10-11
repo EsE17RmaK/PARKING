@@ -63,12 +63,12 @@ export default function Login({ onLoginSuccess }) {
           <form onSubmit={handleSubmit} className="login-form">
             {/* Campo Correo */}
             <div className="login-input-group">
-              <label className="login-label">Correo institucional</label>
+              <label className="login-label">Código o correo institucional</label>
               <input
-                type="email"
+                type="text"
                 value={correo}
                 onChange={(e) => setCorreo(e.target.value)}
-                placeholder="nombre@universidad.edu"
+                placeholder="Ej: u22000001 o correo institucional"
                 required
                 className="login-input"
               />
