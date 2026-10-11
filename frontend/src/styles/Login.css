@@ -1,0 +1,232 @@
+/* Contenedor principal de la pantalla */
+.login-page-background {
+  min-height: 100vh;
+  width: 100%;
+  background-color: #f3f4f6;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  box-sizing: border-box;
+}
+
+/* Tarjeta dividida en dos paneles */
+.login-card-container {
+  width: 100%;
+  max-width: 820px;
+  background-color: #ffffff;
+  border-radius: 20px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+  display: flex;
+  flex-direction: row;
+  overflow: hidden;
+  min-height: 440px;
+}
+
+/* Panel Izquierdo Azul */
+.login-left-panel {
+  width: 48%;
+  background-color: #173473;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px;
+  gap: 20px;
+}
+
+/* Icono "P" con recuadro traslúcido */
+.login-brand-icon {
+  width: 52px;
+  height: 52px;
+  background-color: rgba(255, 255, 255, 0.08);
+  border: 1.5px solid rgba(255, 255, 255, 0.25);
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #ffffff;
+  font-size: 24px;
+  font-weight: 700;
+}
+
+/* Título de la marca */
+.login-brand-title {
+  color: #ffffff;
+  font-size: 20px;
+  font-weight: 500;
+  letter-spacing: 0.3px;
+  margin: 0;
+  text-align: center;
+}
+
+/* Panel Derecho (Formulario) */
+.login-right-panel {
+  width: 52%;
+  padding: 44px 50px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  background-color: #ffffff;
+  box-sizing: border-box;
+}
+
+.login-form-title {
+  font-size: 26px;
+  font-weight: 700;
+  color: #0f172a;
+  margin: 0 0 6px 0;
+}
+
+.login-form-subtitle {
+  font-size: 13.5px;
+  color: #64748b;
+  margin: 0 0 28px 0;
+}
+
+.login-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.login-input-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.login-label {
+  font-size: 12.5px;
+  font-weight: 600;
+  color: #334155;
+}
+
+/* Wrapper para input con icono */
+.login-password-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.login-input {
+  width: 100%;
+  padding: 10px 14px;
+  border-radius: 8px;
+  border: 1px solid #e2e8f0;
+  font-size: 13.5px;
+  color: #1e293b;
+  outline: none;
+  background-color: #ffffff;
+  transition: border-color 0.15s ease;
+  box-sizing: border-box;
+}
+
+.login-input::placeholder {
+  color: #94a3b8;
+}
+
+.login-input:focus {
+  border-color: #173473;
+}
+
+/* Botón de ojo para contraseña */
+.login-eye-button {
+  position: absolute;
+  right: 12px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #64748b;
+}
+
+.login-eye-button:hover {
+  color: #1e293b;
+}
+
+/* Enlace olvidaste contraseña */
+.login-forgot-container {
+  text-align: right;
+  margin-top: 2px;
+}
+
+.login-forgot-link {
+  font-size: 12px;
+  font-weight: 600;
+  color: #173473;
+  text-decoration: none;
+}
+
+.login-forgot-link:hover {
+  text-decoration: underline;
+}
+
+/* Botón Ingresar */
+.login-submit-button {
+  margin-top: 10px;
+  width: 100%;
+  padding: 12px;
+  background-color: #173473;
+  color: #ffffff;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s, opacity 0.2s;
+}
+
+.login-submit-button:hover {
+  background-color: #112758;
+}
+
+.login-submit-button:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+/* Mensajes de respuesta */
+.login-box-message {
+  margin-top: 14px;
+  padding: 10px;
+  border-radius: 8px;
+  font-size: 12.5px;
+  text-align: center;
+}
+
+.login-success-box {
+  background-color: #ecfdf5;
+  color: #065f46;
+  border: 1px solid #a7f3d0;
+}
+
+.login-error-box {
+  background-color: #fef2f2;
+  color: #991b1b;
+  border: 1px solid #fecaca;
+}
+
+/* Responsivo */
+@media (max-width: 640px) {
+  .login-card-container {
+    flex-direction: column;
+  }
+
+  .login-left-panel,
+  .login-right-panel {
+    width: 100%;
+  }
+
+  .login-left-panel {
+    padding: 32px 20px;
+  }
+
+  .login-right-panel {
+    padding: 32px 24px;
+  }
+}
