@@ -1,0 +1,295 @@
+* {
+  box-sizing: border-box;
+}
+
+.garita {
+  width: 100%;
+  min-height: 100vh;
+  background: #f5f7fb;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  color: #17233b;
+  margin: 0;
+  padding: 0;
+}
+
+.garita button {
+  font: inherit;
+}
+
+.garita__header {
+  width: 100%;
+  background: #ffffff;
+  border-bottom: 1px solid #d8e0ee;
+}
+
+.garita__identity {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 24px;
+}
+
+.garita__product {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.garita__brand {
+  display: flex;
+  width: 40px;
+  height: 40px;
+  align-items: center;
+  justify-content: center;
+  border-radius: 10px;
+  background: #173473;
+  color: #ffffff;
+  font-size: 22px;
+  font-weight: 700;
+}
+
+.garita__product-name {
+  display: flex;
+  flex-direction: column;
+}
+
+.garita__product-name span {
+  color: #526079;
+  font-size: 11px;
+}
+
+.garita__product-name strong {
+  color: #173473;
+  font-size: 19px;
+  font-weight: 700;
+}
+
+.garita__security {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border-radius: 100px;
+  background: #edf2fc;
+  color: #173473;
+  font-size: 12.5px;
+  font-weight: 600;
+}
+
+.garita__operator {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 24px;
+  background: #173473;
+  color: #ffffff;
+  font-size: 13.5px;
+  font-weight: 600;
+}
+
+.garita__title {
+  padding: 20px 24px;
+}
+
+.garita__title h1 {
+  margin: 0;
+  color: #17233b;
+  font-size: 24px;
+  font-weight: 700;
+}
+
+.garita__content {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  padding: 24px;
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+.garita__scanner-section {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.garita__camera {
+  display: flex;
+  height: 290px;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px;
+  border-radius: 16px;
+  background: #101d38;
+}
+
+.garita__camera-meta {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  justify-content: space-between;
+  color: #b9c8e4;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.garita__scan-area {
+  position: relative;
+  width: 150px;
+  height: 150px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.garita__scan-line {
+  position: absolute;
+  width: 120px;
+  height: 2px;
+  background: #38bdf8;
+  box-shadow: 0 0 8px #38bdf8;
+}
+
+.garita__corner {
+  position: absolute;
+  width: 30px;
+  height: 30px;
+  border-color: #ffffff;
+  border-style: solid;
+}
+
+.garita__corner--top-left {
+  top: 0;
+  left: 0;
+  border-width: 3px 0 0 3px;
+  border-radius: 8px 0 0 0;
+}
+
+.garita__corner--top-right {
+  top: 0;
+  right: 0;
+  border-width: 3px 3px 0 0;
+  border-radius: 0 8px 0 0;
+}
+
+.garita__corner--bottom-left {
+  bottom: 0;
+  left: 0;
+  border-width: 0 0 3px 3px;
+  border-radius: 0 0 0 8px;
+}
+
+.garita__corner--bottom-right {
+  right: 0;
+  bottom: 0;
+  border-width: 0 3px 3px 0;
+  border-radius: 0 0 8px 0;
+}
+
+.garita__camera > p {
+  margin: 0;
+  color: #ffffff;
+  font-size: 15px;
+  font-weight: 500;
+}
+
+.garita__manual-button {
+  height: 52px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  border: 1.5px solid #173473;
+  border-radius: 12px;
+  background: #ffffff;
+  color: #173473;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.garita__manual-button:hover {
+  background: #edf2fc;
+}
+
+.garita__reservation {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 24px;
+  border: 1px solid #b7dcc7;
+  border-radius: 16px;
+  background: #eaf6ef;
+}
+
+.garita__validity {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.garita__validity-icon {
+  display: flex;
+  width: 36px;
+  height: 36px;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: #167348;
+  color: #ffffff;
+}
+
+.garita__validity h2 {
+  margin: 0;
+  color: #125d3c;
+  font-size: 22px;
+  font-weight: 700;
+}
+
+.garita__reservation-details {
+  margin: 0;
+  color: #17233b;
+  font-size: 17px;
+  line-height: 1.5;
+}
+
+.garita__reservation-details strong {
+  font-weight: 700;
+}
+
+.garita__instructions {
+  margin: 0;
+  color: #125d3c;
+  font-size: 14px;
+}
+
+.garita__confirm-button {
+  height: 56px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  border: 0;
+  border-radius: 12px;
+  background: #167348;
+  color: #ffffff;
+  font-size: 16px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.garita__confirm-button:hover {
+  background: #125d3c;
+}
+
+@media (min-width: 768px) {
+  .garita__content {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    align-items: start;
+    gap: 24px;
+  }
+}
