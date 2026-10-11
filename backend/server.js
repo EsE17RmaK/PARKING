@@ -18,6 +18,7 @@ app.use(express.json());
 app.use('/auth', authRoutes);
 app.use('/api/estudiantes', estudianteRoutes);
 app.use('/api/financiero', financieroRoutes);
+app.use('/api/reservas', reservaRoutes);
 
 // Ruta base de diagnóstico
 app.get('/', (req, res) => {
