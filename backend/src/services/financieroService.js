@@ -1,10 +1,6 @@
-// 
-/**
- * * Servicio para HU-03 / RF03: Verificación de solvencia financiera
- */
-export const validarSolvenciaFinanciera = (condicionPensiones, cuotasVencidas = 0) => {
-  const tieneDeuda = 
-    condicionPensiones?.toUpperCase() === 'CON DEUDA' || 
+const validarSolvenciaFinanciera = (condicionPensiones, cuotasVencidas = 0) => {
+  const tieneDeuda =
+    String(condicionPensiones).toUpperCase() === 'CON DEUDA' ||
     Number(cuotasVencidas) > 0;
 
   if (tieneDeuda) {
@@ -13,7 +9,7 @@ export const validarSolvenciaFinanciera = (condicionPensiones, cuotasVencidas = 
       condicion: 'CON DEUDA',
       cuotasVencidas: Number(cuotasVencidas) || 1,
       bloqueado: true,
-      mensaje: 'Postulación denegada: Registra cuotas de pensión vencidas pendientes con la institución.'
+      mensaje: 'Postulación denegada: Registra cuotas de pensión vencidas pendientes con la institución.',
     };
   }
 
@@ -22,6 +18,10 @@ export const validarSolvenciaFinanciera = (condicionPensiones, cuotasVencidas = 
     condicion: 'AL DIA',
     cuotasVencidas: 0,
     bloqueado: false,
-    mensaje: 'Estudiante solvente. Sin pagos pendientes.'
+    mensaje: 'Estudiante solvente. Sin pagos pendientes.',
   };
+};
+
+module.exports = {
+  validarSolvenciaFinanciera,
 };

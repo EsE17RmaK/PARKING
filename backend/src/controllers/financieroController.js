@@ -1,7 +1,10 @@
-import pool from '../config/db.js';
-import { validarSolvenciaFinanciera } from '../services/financieroService.js';
+const pool = require('../config/db');
+const { validarSolvenciaFinanciera } = require('../services/financieroService');
 
-export const verificarEstadoFinanciero = async (req, res) => {
+/**
+ * HU-03 / RF03: Verificación de solvencia financiera del estudiante
+ */
+const verificarEstadoFinanciero = async (req, res) => {
   try {
     const idUsuario = req.usuario?.id_usuario;
 
@@ -9,6 +12,7 @@ export const verificarEstadoFinanciero = async (req, res) => {
       return res.status(401).json({ mensaje: 'No autorizado' });
     }
 
+    // Consulta parametrizada segura
     const query = `
       SELECT 
         e.id_estudiante,
@@ -34,10 +38,14 @@ export const verificarEstadoFinanciero = async (req, res) => {
 
     return res.status(200).json({
       codigoEstudiante: row.codigo_estudiante,
-      ...evaluacionFinanciera
+      ...evaluacionFinanciera,
     });
   } catch (error) {
     console.error('Error al verificar solvencia financiera (HU-03):', error);
     return res.status(500).json({ mensaje: 'Error al consultar estado financiero' });
   }
+};
+
+module.exports = {
+  verificarEstadoFinanciero,
 };
