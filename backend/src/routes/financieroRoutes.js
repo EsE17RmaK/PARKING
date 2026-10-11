@@ -1,9 +1,9 @@
-import { Router } from 'express';
-import { verificarEstadoFinanciero } from '../controllers/financieroController.js';
-import { verificarJWT } from '../middlewares/authMiddleware.js';
+const { Router } = require('express');
+const { verificarEstadoFinanciero } = require('../controllers/financieroController');
+const { verificarJWT } = require('../middlewares/authMiddleware');
 
 const router = Router();
 
 router.get('/estado-solvencia', verificarJWT, verificarEstadoFinanciero);
 
-export default router;
+module.exports = router;
