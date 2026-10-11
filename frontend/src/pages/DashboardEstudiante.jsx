@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import api from '../api/axiosConfig';
 import '../styles/Dashboard.css';
 
 const initialSpaces = [
@@ -14,13 +15,13 @@ const initialSpaces = [
 
 export default function DashboardEstudiante({ onLogout }) {
   const [estudiante, setEstudiante] = useState({
-    nombre_completo: 'María Valdez',
-    codigo_estudiante: '20241028',
-    promedio_academico: 17,
-    porcentaje_asistencia: 92,
-    condicion_pensiones: 'Al día', // Si cambia a 'Con deuda', se aplican las reglas de la HU-03
+    nombre_completo: 'Cargando...',
+    codigo_estudiante: '---',
+    promedio_academico: 0,
+    porcentaje_asistencia: 0,
+    condicion_pensiones: 'AL DIA',
     penalidades: 0,
-    nivel_prioridad: 'Prioridad Alta',
+    nivel_prioridad: 'Calculando...',
   });
 
   const [selectedSpace, setSelectedSpace] = useState('A-03');
@@ -30,24 +31,53 @@ export default function DashboardEstudiante({ onLogout }) {
   const [showToast, setShowToast] = useState(false);
   const [mensajeToast, setMensajeToast] = useState('');
 
-  // Validación HU-03: Solvencia financiera
-  const esSolvente = estudiante.condicion_pensiones?.toLowerCase() === 'al día';
+  // Validación HU-03: Solvencia financiera (Al día vs Con deuda)
+  const esSolvente = estudiante.condicion_pensiones?.toUpperCase() === 'AL DIA' || 
+                     estudiante.condicion_pensiones?.toLowerCase() === 'al día';
 
   useEffect(() => {
+    // 1. Cargar datos inmediatos de la sesión
     const sesion = localStorage.getItem('usuario');
     if (sesion) {
       try {
-        const parsed = JSON.parse(sesion);
+        const u = JSON.parse(sesion);
         setEstudiante((prev) => ({
           ...prev,
-          nombre_completo: parsed.nombre_completo || prev.nombre_completo,
-          codigo_estudiante: parsed.codigo_estudiante || prev.codigo_estudiante,
-          condicion_pensiones: parsed.condicion_pensiones || prev.condicion_pensiones,
+          nombre_completo: u.nombre_completo || u.nombre || prev.nombre_completo,
+          codigo_estudiante: u.codigo_estudiante || prev.codigo_estudiante,
+          promedio_academico: Number(u.promedio_academico || u.promedio || 0),
+          porcentaje_asistencia: Number(u.porcentaje_asistencia || u.asistencia || 0),
+          condicion_pensiones: u.condicion_pensiones || prev.condicion_pensiones,
+          nivel_prioridad: u.nivel_prioridad || prev.nivel_prioridad,
         }));
       } catch (err) {
-        console.error('Error al leer sesión:', err);
+        console.error('Error al parsear sesión:', err);
       }
     }
+
+    // 2. Consulta al backend para sincronizar métricas en vivo desde Supabase (HU-02)
+    const sincronizarDatos = async () => {
+      try {
+        const res = await api.get('/api/estudiantes/mi-prioridad');
+        if (res.data && res.data.evaluacion) {
+          const { estudiante: info, evaluacion } = res.data;
+          setEstudiante((prev) => ({
+            ...prev,
+            nombre_completo: info.nombreCompleto || prev.nombre_completo,
+            codigo_estudiante: info.codigoEstudiante || prev.codigo_estudiante,
+            promedio_academico: Number(evaluacion.detalles?.promedio ?? prev.promedio_academico),
+            porcentaje_asistencia: Number(evaluacion.detalles?.asistencia ?? prev.porcentaje_asistencia),
+            condicion_pensiones: evaluacion.detalles?.condicionPensiones || prev.condicion_pensiones,
+            penalidades: evaluacion.detalles?.penalidades || 0,
+            nivel_prioridad: evaluacion.nivelPrioridad || prev.nivel_prioridad,
+          }));
+        }
+      } catch (error) {
+        console.log('Utilizando datos provistos en el token de autenticación.');
+      }
+    };
+
+    sincronizarDatos();
   }, []);
 
   const handleCerrarSesion = () => {
@@ -59,7 +89,7 @@ export default function DashboardEstudiante({ onLogout }) {
   const handleConfirmReservation = (e) => {
     e.preventDefault();
     if (!esSolvente) {
-      setMensajeToast('Acceso denegado: regularice sus pensiones pendientes.');
+      setMensajeToast('Acceso denegado: regularice sus pensiones pendientes (HU-03).');
       setShowToast(true);
       setTimeout(() => setShowToast(false), 3500);
       return;
@@ -67,6 +97,14 @@ export default function DashboardEstudiante({ onLogout }) {
     setMensajeToast(`¡Reserva confirmada en ${selectedSpace} para el vehículo ${vehiculo}!`);
     setShowToast(true);
     setTimeout(() => setShowToast(false), 3500);
+  };
+
+  // Obtener iniciales para el avatar (ej: Carlos Gomez -> CG)
+  const getIniciales = (nombre) => {
+    if (!nombre || nombre === 'Cargando...') return 'UT';
+    const partes = nombre.trim().split(' ');
+    if (partes.length >= 2) return `${partes[0][0]}${partes[1][0]}`.toUpperCase();
+    return partes[0].substring(0, 2).toUpperCase();
   };
 
   return (
@@ -139,7 +177,7 @@ export default function DashboardEstudiante({ onLogout }) {
         </div>
       </aside>
 
-      {/* MAIN */}
+      {/* ÁREA PRINCIPAL */}
       <div className="dash-main">
         {/* HEADER */}
         <header className="dash-header">
@@ -155,7 +193,7 @@ export default function DashboardEstudiante({ onLogout }) {
             </button>
             <div className="dash-header-divider" />
             <div className="dash-profile">
-              <div className="dash-avatar">MV</div>
+              <div className="dash-avatar">{getIniciales(estudiante.nombre_completo)}</div>
               <div className="dash-profile-meta">
                 <span>{estudiante.nombre_completo}</span>
                 <small>Estudiante · {estudiante.codigo_estudiante}</small>
@@ -174,7 +212,7 @@ export default function DashboardEstudiante({ onLogout }) {
             <div className="dash-pill-semester">Semestre 2026-II</div>
           </div>
 
-          {/* HU-03 ALERTA SI TIENE DEUDAS */}
+          {/* HU-03 ALERTA SI TIENE DEUDA */}
           {!esSolvente && (
             <div className="dash-debt-alert">
               <svg width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
@@ -189,7 +227,7 @@ export default function DashboardEstudiante({ onLogout }) {
             </div>
           )}
 
-          {/* TARJETA PRIORIDAD */}
+          {/* TARJETA PRIORIDAD (HU-02) */}
           <div className="dash-card">
             <div className="dash-card-header">
               <div className="dash-card-header-left">
@@ -201,10 +239,11 @@ export default function DashboardEstudiante({ onLogout }) {
                   {estudiante.nivel_prioridad}
                 </span>
               </div>
-              <div className="dash-updated-time">Actualizado hoy · 07:30</div>
+              <div className="dash-updated-time">Actualizado en tiempo real</div>
             </div>
 
             <div className="dash-metrics-grid">
+              {/* Mérito Académico */}
               <div className="dash-metric-item">
                 <div className="dash-metric-header">
                   <span>Mérito académico</span>
@@ -213,12 +252,15 @@ export default function DashboardEstudiante({ onLogout }) {
                 <div className="dash-progress-bg">
                   <div
                     className="dash-progress-bar"
-                    style={{ width: `${(estudiante.promedio_academico / 20) * 100}%` }}
+                    style={{ width: `${Math.min(100, (estudiante.promedio_academico / 20) * 100)}%` }}
                   />
                 </div>
-                <span className="dash-metric-sub">Promedio del último semestre</span>
+                <span className="dash-metric-sub">
+                  Promedio ponderado del ciclo ({estudiante.promedio_academico >= 14 ? 'Apto ≥ 14' : 'Bajo'})
+                </span>
               </div>
 
+              {/* Asistencia */}
               <div className="dash-metric-item">
                 <div className="dash-metric-header">
                   <span>Asistencia</span>
@@ -227,15 +269,17 @@ export default function DashboardEstudiante({ onLogout }) {
                 <div className="dash-progress-bg">
                   <div
                     className="dash-progress-bar"
-                    style={{ width: `${estudiante.porcentaje_asistencia}%` }}
+                    style={{ width: `${Math.min(100, estudiante.porcentaje_asistencia)}%` }}
                   />
                 </div>
-                <span className="dash-metric-sub">Asistencia acumulada del ciclo</span>
+                <span className="dash-metric-sub">
+                  Asistencia acumulada ({estudiante.porcentaje_asistencia >= 85 ? 'Apto ≥ 85%' : 'Bajo'})
+                </span>
               </div>
 
               <div className="dash-grid-line" />
 
-              {/* Condición de pensiones con validación de solvencia */}
+              {/* Condición de pensiones */}
               <div className="dash-metric-item">
                 <span style={{ fontSize: '13px', color: '#6b7280' }}>Condición de pensiones</span>
                 <span
@@ -249,6 +293,7 @@ export default function DashboardEstudiante({ onLogout }) {
                 </span>
               </div>
 
+              {/* Penalidades */}
               <div className="dash-metric-item">
                 <strong style={{ fontSize: '15px' }}>Penalidades: {estudiante.penalidades}</strong>
                 <span style={{ display: 'flex', alignItems: 'center', gap: '5px', fontSize: '12px', color: '#6b7280' }}>
@@ -256,7 +301,7 @@ export default function DashboardEstudiante({ onLogout }) {
                     <circle cx="12" cy="12" r="10" />
                     <polyline points="9 12 12 15 16 10" />
                   </svg>
-                  Sin infracciones
+                  {estudiante.penalidades === 0 ? 'Sin infracciones' : 'Infracciones activas'}
                 </span>
               </div>
             </div>
@@ -267,11 +312,11 @@ export default function DashboardEstudiante({ onLogout }) {
                 <line x1="12" y1="16" x2="12" y2="12" />
                 <line x1="12" y1="8" x2="12.01" y2="8" />
               </svg>
-              <span>Tu prioridad te permite acceder de forma preferente a los espacios disponibles.</span>
+              <span>Fórmula institucional: Prioridad = Mérito académico + Asistencia + Pensiones − Penalidades.</span>
             </div>
           </div>
 
-          {/* SOLICITAR RESERVA & MAPA ZONA A */}
+          {/* HU-01: SOLICITAR RESERVA & MAPA ZONA A */}
           <div className="dash-reservation-row">
             {/* Formulario */}
             <div className="dash-card">
