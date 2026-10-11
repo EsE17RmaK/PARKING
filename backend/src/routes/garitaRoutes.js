@@ -1,10 +1,8 @@
-const { Router } = require('express');
-const { consultarReservaGarita, confirmarIngresoGarita } = require('../controllers/garitaController');
-const { verificarJWT } = require('../middlewares/authMiddleware');
+const express = require('express');
+const router = express.Router();
 
-const router = Router();
-
-router.get('/consultar', verificarJWT, consultarReservaGarita);
-router.post('/confirmar-ingreso', verificarJWT, confirmarIngresoGarita);
+router.get('/consultar', (req, res) => {
+  res.json({ mensaje: 'Módulo de garita activo' });
+});
 
 module.exports = router;

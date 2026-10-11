@@ -3,14 +3,16 @@ const express = require('express');
 const cors = require('cors');
 require('dotenv').config();
 
-// 1. Importación de rutas
+// 1. Importación obligatoria de todas las rutas
 const authRoutes = require('./src/routes/authRoutes');
-const estudianteRoutes = require('./src/routes/estudiantes');       // HU-02: Mérito y Asistencia
-const financieroRoutes = require('./src/routes/financieroRoutes');   // HU-03: Solvencia Financiera
+const estudianteRoutes = require('./src/routes/estudiantes');
+const financieroRoutes = require('./src/routes/financieroRoutes');
+const reservaRoutes = require('./src/routes/reservaRoutes');
+const garitaRoutes = require('./src/routes/garitaRoutes');
 
 const app = express();
 
-// 2. Middlewares de seguridad y parseo
+// 2. Middlewares globales
 app.use(cors());
 app.use(express.json());
 
@@ -19,9 +21,9 @@ app.use('/auth', authRoutes);
 app.use('/api/estudiantes', estudianteRoutes);
 app.use('/api/financiero', financieroRoutes);
 app.use('/api/reservas', reservaRoutes);
-app.use('/api/garita', require('./src/routes/garitaRoutes'));
+app.use('/api/garita', garitaRoutes);
 
-// Ruta base de diagnóstico
+// Ruta de diagnóstico
 app.get('/', (req, res) => {
   res.json({ mensaje: 'API ParkingU en ejecución' });
 });
