@@ -1,0 +1,409 @@
+.mis-reservas {
+  min-height: 100vh;
+  background: #f5f7fb;
+  color: #17233b;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  box-sizing: border-box;
+}
+
+.mis-reservas button {
+  font: inherit;
+}
+
+.mis-reservas p,
+.mis-reservas h1,
+.mis-reservas h2 {
+  margin: 0;
+}
+
+.site-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 72px;
+  padding: 0 36px;
+  background: #fff;
+  border-bottom: 1px solid #e1e6ef;
+}
+
+.brand,
+.profile {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.brand__mark {
+  display: grid;
+  width: 38px;
+  height: 38px;
+  place-items: center;
+  border-radius: 10px;
+  background: #173473;
+  color: #fff;
+  font-size: 20px;
+  font-weight: 700;
+}
+
+.brand__eyebrow {
+  color: #6b7280;
+  font-size: 11px;
+}
+
+.brand__name {
+  color: #173473;
+  font-size: 17px;
+  font-weight: 600;
+}
+
+.profile__avatar {
+  display: grid;
+  width: 38px;
+  height: 38px;
+  place-items: center;
+  border-radius: 50%;
+  background: #edf2fc;
+  color: #173473;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.profile__name {
+  font-size: 13px;
+  font-weight: 600;
+  color: #17233b;
+}
+
+.profile__meta {
+  color: #6b7280;
+  font-size: 11px;
+}
+
+.mis-reservas__content {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  padding: 30px 36px 28px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.reservations-card {
+  padding: 24px;
+  border: 1px solid #e1e6ef;
+  border-radius: 16px;
+  background: #fff;
+  box-shadow: 0 4px 16px rgba(23, 35, 59, 0.02);
+}
+
+.reservations-card__intro {
+  padding-bottom: 20px;
+}
+
+.reservations-card__heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.reservations-card__heading h1 {
+  font-size: 24px;
+  font-weight: 700;
+  color: #17233b;
+}
+
+.reservations-card__heading p {
+  color: #6b7280;
+  font-size: 13px;
+}
+
+.reservations-card__description {
+  margin-top: 6px !important;
+  color: #6b7280;
+  font-size: 13.5px;
+}
+
+.reservations-tabs {
+  display: flex;
+  gap: 28px;
+  border-bottom: 1px solid #e1e6ef;
+}
+
+.reservations-tabs__tab {
+  height: 42px;
+  padding: 0 4px;
+  border: 0;
+  background: transparent;
+  color: #6b7280;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.reservations-tabs__tab--active {
+  margin-bottom: -1px;
+  border-bottom: 3px solid #173473;
+  color: #173473;
+  font-weight: 600;
+}
+
+.reservation {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  padding: 20px 0;
+}
+
+.reservation:not(:last-child) {
+  border-bottom: 1px solid #e1e6ef;
+}
+
+.reservation__calendar {
+  display: grid;
+  width: 44px;
+  height: 44px;
+  flex: 0 0 auto;
+  place-items: center;
+  border-radius: 10px;
+  background: #f9fafc;
+  border: 1px solid #e1e6ef;
+  color: #173473;
+}
+
+.reservation__details {
+  min-width: 0;
+  flex: 1;
+}
+
+.reservation__date {
+  font-size: 15px;
+  font-weight: 600;
+  color: #17233b;
+}
+
+.reservation__meta {
+  margin-top: 4px !important;
+  color: #6b7280;
+  font-size: 12.5px;
+}
+
+.reservation__status {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 6px 14px;
+  border-radius: 100px;
+  background: #eaf6ef;
+  color: #21805b;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.reservation__status--pending {
+  background: #fff6dc;
+  color: #946b12;
+}
+
+.reservation__actions {
+  display: flex;
+  gap: 10px;
+}
+
+.button {
+  display: inline-flex;
+  height: 38px;
+  align-items: center;
+  justify-content: center;
+  padding: 0 16px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 600;
+  white-space: nowrap;
+  transition: all 0.15s ease;
+}
+
+.button--qr {
+  gap: 6px;
+  border: 1px solid #173473;
+  background: #173473;
+  color: #fff;
+}
+
+.button--qr:hover {
+  background: #112758;
+}
+
+.button--cancel {
+  border: 1px solid #e7b8bc;
+  background: #fff;
+  color: #be3940;
+}
+
+.button--cancel:hover {
+  background: #fceef0;
+}
+
+.access-info {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 16px;
+  margin-top: 20px;
+  border-radius: 10px;
+  background: #edf2fc;
+  color: #173473;
+  font-size: 12.5px;
+}
+
+.site-footer {
+  display: flex;
+  justify-content: space-between;
+  color: #6b7280;
+  font-size: 11.5px;
+}
+
+/* MODAL DE CANCELACIÓN (HU-09) */
+.cancel-dialog {
+  position: fixed;
+  z-index: 100;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+}
+
+.cancel-dialog__backdrop {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border: 0;
+  background: rgba(23, 35, 59, 0.45);
+}
+
+.cancel-dialog__panel {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  width: min(530px, 100%);
+  flex-direction: column;
+  gap: 20px;
+  padding: 28px;
+  border-radius: 16px;
+  background: #fff;
+  box-shadow: 0 16px 48px rgba(23, 35, 59, 0.18);
+}
+
+.cancel-dialog__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.cancel-dialog__calendar {
+  display: grid;
+  width: 44px;
+  height: 44px;
+  place-items: center;
+  border-radius: 10px;
+  background: #fceef0;
+  color: #be3940;
+}
+
+.cancel-dialog__close {
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  display: grid;
+  place-items: center;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: #6b7280;
+  cursor: pointer;
+}
+
+.cancel-dialog__close:hover {
+  background: #f5f7fb;
+  color: #17233b;
+}
+
+.cancel-dialog__message h2 {
+  font-size: 22px;
+  font-weight: 700;
+  color: #17233b;
+}
+
+.cancel-dialog__message p {
+  margin-top: 6px !important;
+  color: #6b7280;
+  font-size: 13px;
+}
+
+.cancel-dialog__reservation {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px;
+  border: 1px solid #e1e6ef;
+  border-radius: 10px;
+  background: #f9fafc;
+}
+
+.cancel-dialog__date {
+  font-size: 14px;
+  font-weight: 600;
+  color: #17233b;
+}
+
+.cancel-dialog__meta {
+  margin-top: 2px !important;
+  color: #6b7280;
+  font-size: 12px;
+}
+
+/* Condición de la regla de 2 horas */
+.cancel-dialog__condition {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 12px;
+  border-radius: 10px;
+  background: #eaf6ef;
+  color: #21805b;
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.cancel-dialog__condition--warning {
+  background: #fef2f2;
+  color: #991b1b;
+}
+
+.cancel-dialog__actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+}
+
+.button--keep {
+  border: 1px solid #e1e6ef;
+  background: #fff;
+  color: #17233b;
+}
+
+.button--confirm {
+  border: 1px solid #be3940;
+  background: #be3940;
+  color: #fff;
+}
+
+.button--keep:hover {
+  background: #f9fafc;
+}
+
+.button--confirm:hover {
+  background: #a72e35;
+}
