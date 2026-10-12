@@ -1,44 +1,79 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import api from '../api/axiosConfig';
 import '../styles/MisReservas.css';
 
-const defaultReservations = [
-  {
-    id: "PU-08246",
-    date: "24 sept · 08:00–10:00 · A-03",
-    zone: "Zona A",
-    plate: "ABC-123",
-    status: "Confirmada",
-    esCancelacionSinPenalidad: true, // Cumple > 2h de anticipación (HU-09)
-  },
-  {
-    id: "PU-08257",
-    date: "25 sept · 10:00–12:00 · A-05",
-    zone: "Zona A",
-    plate: "ABC-123",
-    status: "Pendiente",
-    esCancelacionSinPenalidad: true,
-  },
-  {
-    id: "PU-08268",
-    date: "28 sept · 08:00–10:00 · B-02",
-    zone: "Zona B",
-    plate: "ABC-123",
-    status: "Confirmada",
-    esCancelacionSinPenalidad: true,
-  },
-];
-
 export default function MisReservas({ onBackToDashboard }) {
-  const [items, setItems] = useState(defaultReservations);
+  const [items, setItems] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [selectedReservation, setSelectedReservation] = useState(null);
   const [activeTab, setActiveTab] = useState('proximas');
 
-  const confirmCancellation = () => {
-    if (!selectedReservation) return;
-    // Liberar la reserva localmente tras la confirmación de la HU-09
-    setItems((current) => current.filter((item) => item.id !== selectedReservation.id));
-    setSelectedReservation(null);
+  const [usuario, setUsuario] = useState({
+    nombre_completo: 'Estudiante UTP',
+    codigo_estudiante: '---'
+  });
+
+  // 1. Obtener reservas reales del estudiante desde Supabase
+  const cargarMisReservas = async () => {
+    try {
+      setLoading(true);
+      const res = await api.get('/api/reservas/mis-reservas');
+      setItems(res.data || []);
+    } catch (error) {
+      console.error('Error al cargar reservas:', error);
+    } finally {
+      setLoading(false);
+    }
   };
+
+  useEffect(() => {
+    const sesion = localStorage.getItem('usuario');
+    if (sesion) {
+      try {
+        const u = JSON.parse(sesion);
+        setUsuario({
+          nombre_completo: u.nombre_completo || u.nombre || 'Estudiante UTP',
+          codigo_estudiante: u.codigo_estudiante || '---'
+        });
+      } catch (e) {
+        console.error('Error al leer sesión:', e);
+      }
+    }
+    cargarMisReservas();
+  }, []);
+
+  // 2. Cancelar la reserva en Supabase
+  const confirmCancellation = async () => {
+    if (!selectedReservation) return;
+
+    try {
+      const res = await api.post('/api/reservas/cancelar', {
+        id_reserva: selectedReservation.id_real || selectedReservation.id
+      });
+
+      alert(res.data?.mensaje || 'Reserva cancelada con éxito.');
+      setSelectedReservation(null);
+      cargarMisReservas(); // Recargar el listado actualizado
+    } catch (error) {
+      console.error('Error al cancelar reserva:', error);
+      alert(error.response?.data?.mensaje || 'No se pudo cancelar la reserva.');
+    }
+  };
+
+  const getIniciales = (nombre) => {
+    if (!nombre) return 'UT';
+    const partes = nombre.trim().split(' ');
+    if (partes.length >= 2) return `${partes[0][0]}${partes[1][0]}`.toUpperCase();
+    return partes[0].substring(0, 2).toUpperCase();
+  };
+
+  // Filtrado según estado simple (Próximas vs Anteriores)
+  const reservasFiltradas = items.filter((r) => {
+    if (activeTab === 'proximas') {
+      return r.status === 'CONFIRMADA' || r.status === 'PENDIENTE';
+    }
+    return r.status === 'CANCELADA' || r.status === 'UTILIZADA';
+  });
 
   return (
     <div className="mis-reservas">
@@ -53,10 +88,10 @@ export default function MisReservas({ onBackToDashboard }) {
         </div>
 
         <div className="profile">
-          <div className="profile__avatar">MV</div>
+          <div className="profile__avatar">{getIniciales(usuario.nombre_completo)}</div>
           <div>
-            <p className="profile__name">María Valdez</p>
-            <p className="profile__meta">Estudiante · 20241028</p>
+            <p className="profile__name">{usuario.nombre_completo}</p>
+            <p className="profile__meta">Estudiante · {usuario.codigo_estudiante}</p>
           </div>
         </div>
       </header>
@@ -66,11 +101,29 @@ export default function MisReservas({ onBackToDashboard }) {
         <section className="reservations-card">
           <div className="reservations-card__intro">
             <div className="reservations-card__heading">
-              <h1>Mis Reservas</h1>
-              <p>{items.length} reservas próximas</p>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
+                <button
+                  type="button"
+                  onClick={onBackToDashboard}
+                  style={{
+                    background: '#edf2fc',
+                    border: 'none',
+                    padding: '8px 14px',
+                    borderRadius: '8px',
+                    color: '#173473',
+                    fontWeight: 600,
+                    cursor: 'pointer',
+                    fontSize: '13px'
+                  }}
+                >
+                  ← Volver al Inicio
+                </button>
+                <h1 style={{ margin: 0 }}>Mis Reservas</h1>
+              </div>
+              <p>{reservasFiltradas.length} reservas registradas</p>
             </div>
             <p className="reservations-card__description">
-              Gestiona tus visitas al campus y cancela oportunamente para evitar penalizaciones (HU-09).
+              Visualiza tus reservas activas o libera tu lugar en el campus si ya no vas a asistir.
             </p>
           </div>
 
@@ -91,58 +144,62 @@ export default function MisReservas({ onBackToDashboard }) {
               onClick={() => setActiveTab('anteriores')}
               type="button"
             >
-              Anteriores
+              Canceladas / Pasadas
             </button>
           </div>
 
-          <div className="reservations-list">
-            {items.map((reservation) => (
-              <article className="reservation" key={reservation.id}>
-                <div className="reservation__calendar">
-                  <svg width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                    <rect x="3" y="4" width="18" height="18" rx="2" />
-                    <line x1="16" y1="2" x2="16" y2="6" />
-                    <line x1="8" y1="2" x2="8" y2="6" />
-                    <line x1="3" y1="10" x2="21" y2="10" />
-                  </svg>
-                </div>
-
-                <div className="reservation__details">
-                  <p className="reservation__date">{reservation.date}</p>
-                  <p className="reservation__meta">
-                    Reserva {reservation.id} · {reservation.zone} · {reservation.plate}
-                  </p>
-                </div>
-
-                <div
-                  className={`reservation__status ${
-                    reservation.status === 'Pendiente' ? 'reservation__status--pending' : ''
-                  }`}
-                >
-                  <span>{reservation.status}</span>
-                </div>
-
-                <div className="reservation__actions">
-                  <button className="button button--qr" type="button">
-                    <svg width="15" height="15" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                      <rect x="3" y="3" width="7" height="7" />
-                      <rect x="14" y="3" width="7" height="7" />
-                      <rect x="14" y="14" width="7" height="7" />
-                      <rect x="3" y="14" width="7" height="7" />
+          {loading ? (
+            <p style={{ textAlign: 'center', padding: '36px', color: '#6b7280' }}>
+              Cargando reservas desde Supabase...
+            </p>
+          ) : reservasFiltradas.length === 0 ? (
+            <div style={{ textAlign: 'center', padding: '40px 20px', color: '#6b7280' }}>
+              <p>No tienes reservas en esta sección.</p>
+            </div>
+          ) : (
+            <div className="reservations-list">
+              {reservasFiltradas.map((reservation) => (
+                <article className="reservation" key={reservation.id}>
+                  <div className="reservation__calendar">
+                    <svg width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                      <rect x="3" y="4" width="18" height="18" rx="2" />
+                      <line x1="16" y1="2" x2="16" y2="6" />
+                      <line x1="8" y1="2" x2="8" y2="6" />
+                      <line x1="3" y1="10" x2="21" y2="10" />
                     </svg>
-                    Ver QR
-                  </button>
-                  <button
-                    className="button button--cancel"
-                    onClick={() => setSelectedReservation(reservation)}
-                    type="button"
+                  </div>
+
+                  <div className="reservation__details">
+                    <p className="reservation__date">{reservation.date}</p>
+                    <p className="reservation__meta">
+                      Código: <b>{reservation.id}</b> · {reservation.zone}
+                    </p>
+                  </div>
+
+                  <div
+                    className={`reservation__status ${
+                      reservation.status === 'CANCELADA' ? 'reservation__status--pending' : ''
+                    }`}
                   >
-                    Cancelar
-                  </button>
-                </div>
-              </article>
-            ))}
-          </div>
+                    <span>{reservation.status}</span>
+                  </div>
+
+                  {/* Botón de Cancelar solo para reservas activas */}
+                  {(reservation.status === 'CONFIRMADA' || reservation.status === 'PENDIENTE') && (
+                    <div className="reservation__actions">
+                      <button
+                        className="button button--cancel"
+                        onClick={() => setSelectedReservation(reservation)}
+                        type="button"
+                      >
+                        Cancelar
+                      </button>
+                    </div>
+                  )}
+                </article>
+              ))}
+            </div>
+          )}
 
           <div className="access-info">
             <svg width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
@@ -150,7 +207,7 @@ export default function MisReservas({ onBackToDashboard }) {
               <line x1="12" y1="16" x2="12" y2="12" />
               <line x1="12" y1="8" x2="12.01" y2="8" />
             </svg>
-            <p>Las cancelaciones realizadas con más de 2 horas de anticipación no acumulan penalidades en tu récord.</p>
+            <p>Al cancelar tu reserva, el lugar se liberará inmediatamente para que otro estudiante pueda solicitarlo.</p>
           </div>
         </section>
 
@@ -160,7 +217,7 @@ export default function MisReservas({ onBackToDashboard }) {
         </footer>
       </main>
 
-      {/* MODAL DE CANCELACIÓN (HU-09) */}
+      {/* MODAL SIMPLE DE CANCELACIÓN */}
       {selectedReservation && (
         <div className="cancel-dialog" role="dialog" aria-modal="true">
           <button
@@ -187,7 +244,7 @@ export default function MisReservas({ onBackToDashboard }) {
 
             <div className="cancel-dialog__message">
               <h2>¿Desea cancelar su reserva?</h2>
-              <p>El espacio se liberará automáticamente para otros estudiantes.</p>
+              <p>El cupo seleccionado se liberará de inmediato en el sistema del campus.</p>
             </div>
 
             <div className="cancel-dialog__reservation">
@@ -199,17 +256,9 @@ export default function MisReservas({ onBackToDashboard }) {
               <div>
                 <p className="cancel-dialog__date">{selectedReservation.date}</p>
                 <p className="cancel-dialog__meta">
-                  Reserva {selectedReservation.id} · {selectedReservation.zone}
+                  Código: <b>{selectedReservation.id}</b> · {selectedReservation.zone}
                 </p>
               </div>
-            </div>
-
-            {/* Regla de negocio HU-09 */}
-            <div className="cancel-dialog__condition">
-              <svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                <polyline points="20 6 9 17 4 12" />
-              </svg>
-              <p>Cancelación sin penalidad (más de 2h de anticipación)</p>
             </div>
 
             <div className="cancel-dialog__actions">

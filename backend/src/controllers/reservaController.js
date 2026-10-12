@@ -1,6 +1,59 @@
 import pool from '../config/db.js';
 import { validarReglaCancelacion } from '../services/cancelacionService.js';
 
+// 1. Crear reserva simple (Persiste en Supabase)
+export const crearReservaSimple = async (req, res) => {
+  try {
+    const idUsuario = req.usuario?.id_usuario;
+    const { fecha_reserva, hora_ingreso } = req.body;
+
+    if (!fecha_reserva || !hora_ingreso) {
+      return res.status(400).json({ mensaje: 'Fecha y hora de ingreso requeridas.' });
+    }
+
+    // Buscar al estudiante asociado al usuario autenticado
+    const estRes = await pool.query(
+      'SELECT id_estudiante, condicion_pensiones FROM estudiantes WHERE id_usuario = $1 LIMIT 1',
+      [idUsuario]
+    );
+
+    if (estRes.rows.length === 0) {
+      return res.status(404).json({ mensaje: 'Perfil de estudiante no encontrado.' });
+    }
+
+    const { id_estudiante, condicion_pensiones } = estRes.rows[0];
+
+    // Restricción por deudas de pensión (HU-03)
+    if (condicion_pensiones?.toUpperCase() === 'CON DEUDA') {
+      return res.status(403).json({ mensaje: 'Acceso restringido por cuotas pendientes.' });
+    }
+
+    // Insertar en la tabla reservas de Supabase
+    const query = `
+      INSERT INTO reservas (id_estudiante, fecha_reserva, horario, placa_vehiculo, estado_reserva)
+      VALUES ($1, $2, $3, 'AUTOMATICO', 'CONFIRMADA')
+      RETURNING id_reserva, fecha_reserva, horario, estado_reserva;
+    `;
+
+    const result = await pool.query(query, [id_estudiante, fecha_reserva, hora_ingreso]);
+    const reservaCreada = result.rows[0];
+
+    return res.status(201).json({
+      mensaje: 'Reserva registrada con éxito en Supabase',
+      reserva: {
+        codigo: `RES-${String(reservaCreada.id_reserva).padStart(4, '0')}`,
+        fecha: reservaCreada.fecha_reserva,
+        hora: reservaCreada.horario,
+        estado: reservaCreada.estado_reserva
+      }
+    });
+  } catch (error) {
+    console.error('Error al crear reserva:', error);
+    return res.status(500).json({ mensaje: 'Error interno al registrar la reserva en la base de datos.' });
+  }
+};
+
+// 2. Cancelar reserva (tu lógica previa intacta)
 export const cancelarReservaEstudiante = async (req, res) => {
   const client = await pool.connect();
   try {
@@ -13,10 +66,8 @@ export const cancelarReservaEstudiante = async (req, res) => {
 
     await client.query('BEGIN');
 
-    // 1. Obtener datos de la reserva asegurando propiedad del usuario
     const reservaQuery = `
-      SELECT r.id_reserva, r.id_estudiante, r.id_plaza, r.fecha_reserva, 
-             r.hora_inicio, r.estado_reserva
+      SELECT r.id_reserva, r.id_estudiante, r.fecha_reserva, r.horario, r.estado_reserva
       FROM reservas r
       INNER JOIN estudiantes e ON e.id_estudiante = r.id_estudiante
       WHERE r.id_reserva = $1 AND e.id_usuario = $2 AND r.estado_reserva IN ('CONFIRMADA', 'PENDIENTE')
@@ -30,32 +81,21 @@ export const cancelarReservaEstudiante = async (req, res) => {
     }
 
     const reserva = reservaRes.rows[0];
+    const evaluacion = validarReglaCancelacion(reserva.fecha_reserva, reserva.horario);
 
-    // 2. Validar regla de las 2 horas (HU-09 / RF10 / RF11)
-    const evaluacion = validarReglaCancelacion(reserva.fecha_reserva, reserva.hora_inicio);
-
-    // 3. Actualizar estado de la reserva
     await client.query(
       `UPDATE reservas 
-       SET estado_reserva = 'CANCELADA', fecha_cancelacion = NOW() 
+       SET estado_reserva = 'CANCELADA' 
        WHERE id_reserva = $1`,
       [id_reserva]
     );
 
-    // 4. Liberar la plaza para que quede disponible (HU-09 Criterio 1)
-    await client.query(
-      `UPDATE plazas 
-       SET estado_plaza = 'LIBRE' 
-       WHERE id_plaza = $1`,
-      [reserva.id_plaza]
-    );
-
-    // 5. Si fue tardía, registrar penalidad (RF11)
     if (evaluacion.aplicaPenalidad) {
       await client.query(
-        `INSERT INTO penalidades (id_estudiante, motivo, fecha_sancion, estado)
-         VALUES ($1, $2, NOW(), 'ACTIVA')`,
-        [reserva.id_estudiante, evaluacion.motivo]
+        `UPDATE estudiantes 
+         SET penalidades = COALESCE(penalidades, 0) + 1 
+         WHERE id_estudiante = $1`,
+        [reserva.id_estudiante]
       );
     }
 

@@ -1,3 +1,4 @@
+// backend/src/controllers/estudianteController.js
 const pool = require('../config/db');
 const { evaluarElegibilidadYPrioridad } = require('../services/prioridadService');
 
@@ -32,11 +33,12 @@ const getPrioridadEstudiante = async (req, res) => {
     const result = await pool.query(query, [idUsuario]);
 
     if (result.rows.length === 0) {
-      return res.status(404).json({ mensaje: 'Registro de estudiante no encontrado para este usuario.' });
+      return res.status(404).json({ mensaje: 'Registro de estudiante no encontrado.' });
     }
 
     const row = result.rows[0];
 
+    // Cálculo algorítmico de la HU-02
     const evaluacion = evaluarElegibilidadYPrioridad({
       promedioAcademico: row.promedio_academico,
       porcentajeAsistencia: row.porcentaje_asistencia,
@@ -44,9 +46,10 @@ const getPrioridadEstudiante = async (req, res) => {
       penalidades: row.penalidades,
     });
 
+    // Solo actualiza las columnas que existen en tu tabla de Supabase (sin fechas)
     await pool.query(
       `UPDATE estudiantes 
-       SET puntaje_prioridad = $1, nivel_prioridad = $2, fecha_actualizacion_etl = NOW()
+       SET puntaje_prioridad = $1, nivel_prioridad = $2
        WHERE id_estudiante = $3`,
       [evaluacion.puntajePrioridad, evaluacion.nivelPrioridad, row.id_estudiante]
     );
@@ -60,7 +63,7 @@ const getPrioridadEstudiante = async (req, res) => {
     });
   } catch (error) {
     console.error('Error al evaluar mérito y asistencia (HU-02):', error);
-    return res.status(500).json({ mensaje: 'Error interno del servidor al procesar la prioridad académica.' });
+    return res.status(500).json({ mensaje: 'Error interno del servidor al procesar prioridad.' });
   }
 };
 

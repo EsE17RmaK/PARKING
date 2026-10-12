@@ -275,7 +275,7 @@
   font-weight: 500;
 }
 
-/* CARDS GENERALES */
+/* CARDS */
 .dash-card {
   background: #ffffff;
   border: 1px solid #e1e6ef;
@@ -316,12 +316,16 @@
   gap: 5px;
 }
 
+.dash-badge-inline {
+  width: fit-content;
+}
+
 .dash-updated-time {
   font-size: 12px;
   color: #6b7280;
 }
 
-/* METRICAS HU-02 */
+/* METRICAS */
 .dash-metrics-grid {
   display: grid;
   grid-template-columns: 1fr 1fr 1px 1fr 1fr;
@@ -374,6 +378,23 @@
   background: #e1e6ef;
 }
 
+.dash-metric-label-pension {
+  font-size: 13px;
+  color: #6b7280;
+}
+
+.dash-metric-penalties {
+  font-size: 15px;
+}
+
+.dash-metric-penalty-status {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 12px;
+  color: #6b7280;
+}
+
 .dash-info-row {
   display: flex;
   align-items: center;
@@ -384,18 +405,29 @@
   border-top: 1px solid #f1f4f9;
 }
 
-/* RESERVA Y MAPA HU-01 */
-.dash-reservation-row {
-  display: grid;
-  grid-template-columns: 1.35fr 1fr;
-  gap: 24px;
+/* FORMULARIO SIMPLIFICADO */
+.dash-reservation-simple {
+  max-width: 680px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+.dash-reservation-title {
+  font-size: 19px;
+  font-weight: 700;
+  margin: 0;
+}
+
+.dash-reservation-subtitle {
+  font-size: 13px;
+  color: #6b7280;
+  margin: 4px 0 20px 0;
 }
 
 .dash-form-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 16px;
-  margin-top: 18px;
 }
 
 .dash-input-wrap {
@@ -439,7 +471,7 @@
 }
 
 .dash-banner-summary {
-  margin-top: 18px;
+  margin-top: 20px;
   padding: 12px 14px;
   background: #edf2fc;
   border-radius: 10px;
@@ -473,6 +505,11 @@
   background: #112758;
 }
 
+.dash-btn-disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
 .dash-subtext-note {
   text-align: center;
   font-size: 11px;
@@ -480,145 +517,7 @@
   margin-top: 10px;
 }
 
-/* MAPA ZONA A */
-.dash-map-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.dash-map-location {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  font-size: 12.5px;
-  color: #6b7280;
-  margin-top: 6px;
-}
-
-.dash-parking-bay {
-  margin-top: 16px;
-  border: 1px solid #e1e6ef;
-  background: #f9fafc;
-  border-radius: 12px;
-  padding: 14px;
-}
-
-.dash-parking-row {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 8px;
-}
-
-.dash-space-slot {
-  height: 54px;
-  border-radius: 8px;
-  border: 1px solid;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 2px;
-  font-size: 10.5px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.15s;
-}
-
-.dash-space-slot.available {
-  border-color: #a9cdbb;
-  background: #ffffff;
-  color: #6b7280;
-}
-
-.dash-space-slot.available:hover {
-  border-color: #21805b;
-  background: #f5fbf7;
-}
-
-.dash-space-slot.occupied {
-  border-color: #d9dfe9;
-  background: #e9edf4;
-  color: #9ca3af;
-  cursor: not-allowed;
-}
-
-.dash-space-slot.selected {
-  border-color: #173473;
-  background: #173473;
-  color: #ffffff;
-}
-
-.dash-lane-indicator {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 8px 12px;
-  font-size: 10px;
-  font-weight: 600;
-  color: #6b7280;
-}
-
-.dash-lane-indicator hr {
-  flex: 1;
-  margin: 0 12px;
-  border: 0;
-  border-top: 1px solid #d9dfe9;
-}
-
-.dash-map-legend {
-  margin-top: 14px;
-  display: flex;
-  justify-content: space-around;
-  font-size: 11px;
-  color: #6b7280;
-}
-
-.dash-map-legend span {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
-
-.legend-dot {
-  width: 8px;
-  height: 8px;
-  border-radius: 2px;
-}
-
-.dash-selected-highlight {
-  margin-top: 16px;
-  padding-top: 14px;
-  border-top: 1px solid #e1e6ef;
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-
-.dash-selected-badge {
-  width: 48px;
-  height: 42px;
-  background: #edf2fc;
-  color: #173473;
-  font-weight: 700;
-  font-size: 14px;
-  border-radius: 8px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.dash-selected-info strong {
-  display: block;
-  font-size: 13px;
-  color: #17233b;
-}
-
-.dash-selected-info span {
-  font-size: 11px;
-  color: #6b7280;
-}
-
+/* MENSAJE TOAST */
 .dash-toast {
   position: fixed;
   bottom: 24px;
@@ -630,8 +529,29 @@
   border-radius: 10px;
   font-size: 13.5px;
   font-weight: 500;
-  box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
   z-index: 100;
+}
+
+.dash-toast-card {
+  min-width: 320px;
+  text-align: left;
+  line-height: 1.4;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.dash-toast-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 4px;
+}
+
+.dash-toast-sub {
+  font-size: 12.5px;
+  opacity: 0.9;
 }
 
 .dash-footer {
@@ -642,7 +562,7 @@
   color: #6b7280;
 }
 
-/* HU-03: Estilos para bloqueo y alertas financieras */
+/* HU-03 */
 .dash-badge-debt {
   background: #fee2e2;
   color: #991b1b;
@@ -676,4 +596,186 @@
   font-size: 12.5px;
   color: #b91c1c;
   margin: 0;
+}
+
+/* Sección de duración (3 o 4 horas) */
+.dash-duration-section {
+  margin-top: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.dash-duration-label {
+  font-size: 13px;
+  font-weight: 600;
+  color: #17233b;
+}
+
+.dash-duration-radios {
+  display: flex;
+  gap: 20px;
+}
+
+.dash-radio-option {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  color: #17233b;
+  cursor: pointer;
+}
+
+.dash-radio-option input[type="radio"] {
+  width: 16px;
+  height: 16px;
+  cursor: pointer;
+}
+
+/* Panel de estado de reserva */
+.dash-status-card-active {
+  background: #f0fdf4;
+  border: 1px solid #bbf7d0;
+  border-radius: 12px;
+  padding: 18px;
+  position: relative;
+}
+
+.dash-status-badge {
+  display: inline-block;
+  background: #21805b;
+  color: #ffffff;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 3px 10px;
+  border-radius: 12px;
+  text-transform: uppercase;
+  margin-bottom: 12px;
+}
+
+.dash-status-details p {
+  margin: 4px 0;
+  font-size: 13.5px;
+  color: #1f2937;
+}
+
+.dash-status-card-empty {
+  border: 1.5px dashed #e1e6ef;
+  border-radius: 12px;
+  padding: 28px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  color: #6b7280;
+  font-size: 13px;
+}
+
+/* Layout en forma de 'D' */
+.dash-d-layout {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 16px;
+  margin-top: 14px;
+}
+
+.dash-zone-box {
+  background: #ffffff;
+  border: 2px solid #cbd5e1;
+  border-radius: 10px;
+  padding: 12px 14px;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.dash-zone-box:hover {
+  border-color: #94a3b8;
+  background: #f1f5f9;
+}
+
+.dash-zone-box.selected {
+  border-color: #173473;
+  background: #edf2fc;
+  box-shadow: 0 0 0 1px #173473;
+}
+
+.dash-zone-info {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.dash-zone-info strong {
+  font-size: 13.5px;
+  color: #1e293b;
+}
+
+.dash-zone-info span {
+  font-size: 12px;
+  font-weight: 600;
+  color: #21805b;
+}
+
+/* Sección media: carril de tránsito a la izquierda + lateral a la derecha */
+.dash-d-middle {
+  display: grid;
+  grid-template-columns: 1fr 1.6fr;
+  gap: 12px;
+  min-height: 120px;
+}
+
+.dash-transit-lane {
+  border: 2px dashed #cbd5e1;
+  border-radius: 10px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  font-size: 11px;
+  font-weight: 600;
+  color: #64748b;
+  text-align: center;
+  padding: 10px;
+  background: #f1f5f9;
+}
+
+.dash-lane-arrow {
+  font-size: 16px;
+  color: #94a3b8;
+}
+
+.dash-zone-slots-mini {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.dash-zone-slots-grid {
+  display: grid;
+  grid-template-columns: repeat(10, 1fr);
+  gap: 4px;
+}
+
+.dash-slot-dot {
+  width: 14px;
+  height: 14px;
+  border-radius: 4px;
+  display: inline-block;
+}
+
+.dash-slot-dot.free {
+  background: #21805b;
+}
+
+.dash-slot-dot.occupied {
+  background: #cbd5e1;
 }
